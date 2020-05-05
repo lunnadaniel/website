@@ -165,10 +165,20 @@ function onKeyDown(event) {
 }
 function onMouseDown(event) {
 	// Rotate the Helicopter towards that direction
+	ax = event.point.x-helicopter.position.x; // x component of vector A
+	ay = event.point.y-helicopter.position.y; // y component of vector A
+	aH = Math.pow((Math.pow(ax,2)+Math.pow(ay,2)),0.5);
+	console.log(ax, ay, aH)
+	// Vector B is always the unitary positive vector of x (1,0)
+	// Dot product between A * B = (ax*bx+ay*by)
+	dot = (ax*1+ay*0);
+	angle = Math.acos(dot/aH)*(180/Math.PI)*Math.sign(ay);
+	helicopter.rotation = angle;
+	console.log(angle);
+	// Move the Helicopter ?
 	dx = event.point.x-helicopter.position.x;
 	dy = event.point.y-helicopter.position.y;
 	distance = Math.pow((Math.pow(dx,2)+Math.pow(dy,2)),0.5);
-	
 	//helicopter.rotation = 180
 	//helicopter.rotate(-45);
 	//helicopter.position.angle = event.point.angle;
