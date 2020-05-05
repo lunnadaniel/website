@@ -118,11 +118,30 @@ tailPropeller3.rotate(90);
 var tailPropeller = new Group([tailPropeller1, tailPropeller2, tailPropeller3]);
 
 var helicopter = new Group([cabin, triangleTail, tailPropeller, topPropeller]);
-
+helicopter.applyMatrix = false
 var step = 10;
 
 viewWith = view.size.width;
 viewHeight = view.size.height;
+
+function rotateHelicopter(event){
+	// Rotate the Helicopter towards that direction
+	ax = event.point.x-helicopter.position.x; // x component of vector A
+	ay = event.point.y-helicopter.position.y; // y component of vector A
+	aH = Math.pow((Math.pow(ax,2)+Math.pow(ay,2)),0.5);
+	// Vector B is always the unitary positive vector of x (1,0)
+	// Dot product between A * B = (ax*bx+ay*by)
+	dot = (ax*1+ay*0);
+	angle = Math.acos(dot/aH)*(180/Math.PI)*Math.sign(ay);
+	helicopter.rotation = angle;
+}
+function helicopterDistance(point){
+	// compute chopper distance to the point
+	dx = point.x-helicopter.position.x;
+	dy = point.y-helicopter.position.y;
+	distance = Math.pow((Math.pow(dx,2)+Math.pow(dy,2)),0.5);
+	return [dx, dy, distance]; // 0, 1 ,2
+}
 
 function onResize(event) {
 	// Whenever the window is resized, recenter the path:
@@ -164,27 +183,37 @@ function onKeyDown(event) {
 	}
 }
 function onMouseDown(event) {
-	// Rotate the Helicopter towards that direction
-	ax = event.point.x-helicopter.position.x; // x component of vector A
-	ay = event.point.y-helicopter.position.y; // y component of vector A
-	aH = Math.pow((Math.pow(ax,2)+Math.pow(ay,2)),0.5);
-	console.log(ax, ay, aH)
-	// Vector B is always the unitary positive vector of x (1,0)
-	// Dot product between A * B = (ax*bx+ay*by)
-	dot = (ax*1+ay*0);
-	angle = Math.acos(dot/aH)*(180/Math.PI)*Math.sign(ay);
-	helicopter.rotation = angle;
-	console.log(angle);
-	// Move the Helicopter ?
-	dx = event.point.x-helicopter.position.x;
-	dy = event.point.y-helicopter.position.y;
-	distance = Math.pow((Math.pow(dx,2)+Math.pow(dy,2)),0.5);
-	//helicopter.rotation = 180
-	//helicopter.rotate(-45);
-	//helicopter.position.angle = event.point.angle;
-	//helicopter.position = ({x: event.point.x, 
-							//y: event.point.y})
+    rotateHelicopter(event);
+	//console.log(helicopter);
+
+}
+function onMouseDrag(event){
+	rotateHelicopter(event);
+	currentDistance = helicopterDistance(event.point);
+	//console.log(currentDistance[0], currentDistance[1]);
+	factor = currentDistance[2]
+	iterations = 0
+	while (currentDistance[2] > 10){
+		console.log(helicopter.position);
+		console.log(currentDistance[2]);
+		factor = 0.3;
+		helicopter.position = {x: helicopter.position.x + currentDistance[0]/Math.pow(factor,1/4),
+							   y: helicopter.position.y + currentDistance[1]/Math.pow(factor,1/4)
+							   }
+		currentDistance = helicopterDistance(event.point);
+		sleep(100);
+		iterations += 1;
+		if (iterations>15){break}
+	}
 }
 ///function onMouseUp(event) {
 //	helicopter.position = ({x: 100, y: 100})
 //}
+function sleep(milliseconds) {
+	var start = new Date().getTime();
+	for (var i = 0; i < 1e7; i++) {
+		if ((new Date().getTime() - start) > milliseconds){
+		break;
+    }
+  }
+}
