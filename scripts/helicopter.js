@@ -71,7 +71,7 @@ cabin4P.position.x += 41;
 
 var cabin = new Group([cabin1P, cabin2P, cabin4P]);
 
-// topPropeller
+// TOP PROPELLER
 
 var baseRotor = new Path.RegularPolygon(view.center, 3, 10);
 baseRotor.fillColor = 'black';
@@ -163,3 +163,18 @@ function onKeyDown(event) {
 		helicopter.position.x += step;
 	}
 }
+function onMouseDown(event) {
+	// Rotate the Helicopter towards that direction
+	dx = event.point.x-helicopter.position.x;
+	dy = event.point.y-helicopter.position.y;
+	distance = Math.pow((Math.pow(dx,2)+Math.pow(dy,2)),0.5);
+	
+	//helicopter.rotation = 180
+	//helicopter.rotate(-45);
+	//helicopter.position.angle = event.point.angle;
+	//helicopter.position = ({x: event.point.x, 
+							//y: event.point.y})
+}
+///function onMouseUp(event) {
+//	helicopter.position = ({x: 100, y: 100})
+//}
