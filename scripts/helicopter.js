@@ -1,57 +1,21 @@
-var cloud = new Path();
-cloud.add(new Point(38, 9)); 
-cloud.add(new Point(47, 10)); 
-cloud.add(new Point(54, 14)); 
-cloud.add(new Point(56, 20)); 
-cloud.add(new Point(62, 17)); 
-cloud.add(new Point(66, 16));
-cloud.add(new Point(68, 16)); 
-cloud.add(new Point(77, 18)); 
-cloud.add(new Point(81, 20)); 
-cloud.add(new Point(84, 23)); 
-cloud.add(new Point(87, 30)); 
-cloud.add(new Point(95, 34)); 
-cloud.add(new Point(100, 40)); 
-cloud.add(new Point(102, 49));
-cloud.add(new Point(101, 59));
-cloud.add(new Point(94, 65));
-cloud.add(new Point(84, 68));
-cloud.add(new Point(77, 67));
-cloud.add(new Point(72, 65));
-cloud.add(new Point(69, 69));
-cloud.add(new Point(65, 72));
-cloud.add(new Point(61, 74));
-cloud.add(new Point(54, 76));
-cloud.add(new Point(46, 74));
-cloud.add(new Point(40, 70));
-cloud.add(new Point(36, 64));
-cloud.add(new Point(32, 67));
-cloud.add(new Point(27, 69));
-cloud.add(new Point(20, 69));
-cloud.add(new Point(14, 66));
-cloud.add(new Point(8, 60));
-cloud.add(new Point(5, 50));
-cloud.add(new Point(7, 41));
-cloud.add(new Point(13, 34));
-cloud.add(new Point(20, 31));
-cloud.add(new Point(20, 21));
-cloud.add(new Point(22, 18));
-cloud.add(new Point(24, 15));
-cloud.add(new Point(30, 11));
-cloud.closed = true;
+// ------ CONSTANTS ----------------------------------------
+var numberOfClouds = 100;
+var factor = 2;
+var lastTouchedPoint = new Point(view.center.x, view.center.y); // Point (x,y)
+console.log(lastTouchedPoint);
+// ---------------------------------------------------------
+var cloud = new Path('M42.65,19.05l6.3,0.7l4.9,2.8l1.4,4.2l4.2,-2.1l2.8,-0.7h1.4l6.3,1.4l2.8,1.4l2.1,2.1l2.1,4.9l5.6,2.8l3.5,4.2l1.4,6.3l-0.7,7l-4.9,4.2l-7,2.1l-4.9,-0.7l-3.5,-1.4l-2.1,2.8l-2.8,2.1l-2.8,1.4l-4.9,1.4l-5.6,-1.4l-4.2,-2.8l-2.8,-4.2l-2.8,2.1l-3.5,1.4h-4.9l-4.2,-2.1l-4.2,-4.2l-2.1,-7l1.4,-6.3l4.2,-4.9l4.9,-2.1v-7l1.4,-2.1l1.4,-2.1l4.2,-2.8z');
 cloud.fillColor = 'white';
 cloud.scale(0.7,0.7);
 
-var count = 100;
-
-for (var i = 0; i < count; i++) {
+for (var i = 0; i < numberOfClouds; i++) {
 	var obj = cloud.clone();
 	var center = Point.random() * view.size;
 	obj.position = center;
-	obj.scale(i / count);
+	obj.scale(i / numberOfClouds);
 }
-
-//------ CREATION OF THE MAIN OBJECT: HELICOPTER --------
+//cloud.remove();
+// ------ CREATION OF THE MAIN OBJECT: HELICOPTER --------
 //CABIN
 
 var cabin1P = new Path.RegularPolygon(view.center, 3, 20);
@@ -118,6 +82,7 @@ tailPropeller3.rotate(90);
 var tailPropeller = new Group([tailPropeller1, tailPropeller2, tailPropeller3]);
 
 var helicopter = new Group([cabin, triangleTail, tailPropeller, topPropeller]);
+helicopter.position = view.center;
 helicopter.applyMatrix = false
 var step = 10;
 
@@ -143,11 +108,23 @@ function helicopterDistance(point){
 	return [dx, dy, distance]; // 0, 1 ,2
 }
 
+function moveHelicopter(){
+	currentDistance = helicopterDistance(lastTouchedPoint);
+	if (currentDistance[2] > 10){
+		dx = currentDistance[0]/Math.pow(currentDistance[2],1/factor);
+		dy = currentDistance[1]/Math.pow(currentDistance[2],1/factor);
+		helicopter.position = {x: helicopter.position.x + dx,
+							   y: helicopter.position.y + dy
+							   }
+		//lastTouchedPoint = new Point(lastTouchedPoint.x+dx,lastTouchedPoint.y+dy);
+	}
+}
+
+// ======================== EVENTS ===============================
 function onResize(event) {
 	// Whenever the window is resized, recenter the path:
 	helicopter.position = view.center;
-	
-	for (var i = 0; i < count; i++) {
+	for (var i = 0; i < numberOfClouds; i++) {
 		var item = project.activeLayer.children[i];
 		item.position.y = item.position.y*view.size.height/viewHeight;
 		item.position.x = item.position.x*view.size.width/viewWith;
@@ -157,16 +134,15 @@ function onResize(event) {
 }
 function onFrame(event) {
 	tailPropeller.rotate(50);
-	cloud.remove();
-	for (var i = 0; i < count; i++) 
-	{
-			var item = project.activeLayer.children[i];
-			item.position.x -= item.bounds.width / 20;
-			if (item.bounds.right < 0) 
-			{
-					item.position.x = view.size.width+item.bounds.width;
-			}
+	for (var i = 0; i < numberOfClouds; i++){
+		var item = project.activeLayer.children[i];
+		item.position.x -= item.bounds.width / 20;
+		if (item.bounds.right < 0) 
+		{
+				item.position.x = view.size.width+item.bounds.width;
+		}
 	}
+	moveHelicopter();
 }
 function onKeyDown(event) {
 	if(event.key == 'up'){
@@ -183,37 +159,11 @@ function onKeyDown(event) {
 	}
 }
 function onMouseDown(event) {
-    rotateHelicopter(event);
-	//console.log(helicopter);
-
+	rotateHelicopter(event);
+	lastTouchedPoint = event.downPoint;
 }
 function onMouseDrag(event){
 	rotateHelicopter(event);
-	currentDistance = helicopterDistance(event.point);
-	//console.log(currentDistance[0], currentDistance[1]);
-	factor = currentDistance[2]
-	iterations = 0
-	while (currentDistance[2] > 10){
-		console.log(helicopter.position);
-		console.log(currentDistance[2]);
-		factor = 0.3;
-		helicopter.position = {x: helicopter.position.x + currentDistance[0]/Math.pow(factor,1/4),
-							   y: helicopter.position.y + currentDistance[1]/Math.pow(factor,1/4)
-							   }
-		currentDistance = helicopterDistance(event.point);
-		sleep(100);
-		iterations += 1;
-		if (iterations>15){break}
-	}
+	lastTouchedPoint = event.lastPoint;
 }
-///function onMouseUp(event) {
-//	helicopter.position = ({x: 100, y: 100})
-//}
-function sleep(milliseconds) {
-	var start = new Date().getTime();
-	for (var i = 0; i < 1e7; i++) {
-		if ((new Date().getTime() - start) > milliseconds){
-		break;
-    }
-  }
-}
+console.log(helicopter);
