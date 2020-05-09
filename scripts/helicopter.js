@@ -1,6 +1,6 @@
 // ------ CONSTANTS ----------------------------------------
 var numberOfClouds = 100;
-var factor = 2;
+var factor = 1.8;
 var lastTouchedPoint = new Point(view.center.x, view.center.y); // Point (x,y)
 console.log(lastTouchedPoint);
 // ---------------------------------------------------------
@@ -119,18 +119,20 @@ function moveHelicopter(){
 		//lastTouchedPoint = new Point(lastTouchedPoint.x+dx,lastTouchedPoint.y+dy);
 	}
 }
-
 // ======================== EVENTS ===============================
 function onResize(event) {
 	// Whenever the window is resized, recenter the path:
-	helicopter.position = view.center;
+	//helicopter.position = view.center;
+	helicopter.position.y = helicopter.position.y*view.size.height/viewHeight;
+	helicopter.position.x = helicopter.position.x*view.size.width/viewWith;
+	lastTouchedPoint = helicopter.position;
 	for (var i = 0; i < numberOfClouds; i++) {
 		var item = project.activeLayer.children[i];
 		item.position.y = item.position.y*view.size.height/viewHeight;
 		item.position.x = item.position.x*view.size.width/viewWith;
 	}
 	viewWith = view.size.width;
-	viewHeight = view.size.height;		
+	viewHeight = view.size.height;
 }
 function onFrame(event) {
 	tailPropeller.rotate(50);
