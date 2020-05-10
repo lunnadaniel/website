@@ -1,1 +1,1 @@
-This is my very first website usinng the Paper.js Javascript library
+This is my very first website using the Paper.js Javascript library
