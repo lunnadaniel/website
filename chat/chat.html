@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Scooby Doo</title>
-		<link rel="icon" href="img/sprite0.ico">
+		<link rel="icon" href="img/chat-64.png">
 		<link rel="stylesheet" href="css/style.css">
 		<!-- Load the Paper.js library -->
 		<script type="text/javascript" src="lib/paper-full.js"></script>
@@ -26,7 +26,7 @@
 			console.log(ground);
 			console.log(view.size);
 			groundSide = view.size.width/(2*Math.pow(2,0.5))
-			//ground.scale(view.size.width/groundSide, 1); // scale(dx, dy)
+			ground.scale(view.size.width/groundSide, 1); // scale(dx, dy)
 			
 			//ground.position.y = view.center.y + view.size.height*0.5 +scooby.height*0.5;
 			
