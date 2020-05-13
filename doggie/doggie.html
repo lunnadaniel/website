@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Scooby Doo</title>
+		<link rel="icon" href="img/sprite0.ico">
+		<link rel="stylesheet" href="css/style.css">
+		<!-- Load the Paper.js library -->
+		<script type="text/javascript" src="lib/paper-full.js"></script>
+		<!-- Define inlined PaperScript associate it with myCanvas -->
+		<script type="text/paperscript" canvas="myCanvas">
+			// ------------ VARIABLES -----------------------
+			step = 10;
+			scoobyDirection = 'right';
+			currentSkin = 0;
+			numberOfMovingSkins = 5;
+			
+			// ----------------------------------------------
+			var scooby = new Raster('img/scooby/sprite0.png');
+			scooby.size = {height: 65, width: 80};
+			scooby.position = view.center;
+			var centerGround = new Point(view.center.x, view.size.height*0.75)
+			radius = (view.size.height*0.5)/Math.pow(2,0.5);
+			var ground = new Path.RegularPolygon(centerGround, 4, radius); // RegularPolygon(CENTER, SIDES, SIZE)
+			ground.fillColor = 'black';
+			console.log(ground);
+			console.log(view.size);
+			groundSide = view.size.width/(2*Math.pow(2,0.5))
+			ground.scale(view.size.width/groundSide, 1); // scale(dx, dy)
+			
+			//ground.position.y = view.center.y + view.size.height*0.5 +scooby.height*0.5;
+			
+			project.activeLayer.children[0] = ground;
+			project.activeLayer.children[1] = scooby;
+			
+			function onResize(event) {
+				scooby.position = view.center;
+				//ground.position = view.center;
+				//ground.position.y = view.center.y + view.size.height*0.5 + scooby.height*0.5;
+			}
+			
+			// Permanent framing
+			function onFrame(event){
+				if (event.count == 1){
+					console.log(event);
+				}
+				//console.log()
+				//scooby.source = 'img/sprite1.png';
+				//scooby.source = 'img/sprite0.png';
+			}
+			
+			function onKeyDown(event) {
+				if(event.key == 'left'){
+					changeMovingSkin();
+					scooby.position.x -= step;
+					if (scoobyDirection == "right"){
+						scooby.scale(-1,1);
+					}
+					scoobyDirection = "left";
+					
+				}
+				if(event.key == 'right'){
+					scooby.position.x += step;
+					changeMovingSkin();
+					if (scoobyDirection == "left"){
+						scooby.scale(-1,1);
+					}
+					scoobyDirection = "right";
+				}
+			}
+			 // ------------ FUNCTIONS -------------------------
+			 function changeMovingSkin(){
+				if (currentSkin==numberOfMovingSkins){
+					currentSkin = 0
+				}
+				currentSkin += 1;
+				scooby.source = 'img/scooby/moving/'+currentSkin+'.png'
+			 }
+			
+			console.log(view);
+			console.log(ground);
+			console.log(scooby);
+		</script>
+	</head>
+	<body>
+		<canvas id="myCanvas" hidpi="off" resize style="background:#A9C0F9"></canvas>
+	</body>
+</html>
